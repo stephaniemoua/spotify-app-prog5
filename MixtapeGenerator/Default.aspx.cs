@@ -43,8 +43,8 @@ namespace Program4c
 
             Label1.Text = "Searching for " + song;
 
-            string CLIENTID = "replace-with-id";
-            string CLIENTSECRET = "replace-with-secret";
+            string CLIENTID = "APIKEYHERE";
+            string CLIENTSECRET = "APISECRETKEYHERE";
             var config = SpotifyClientConfig.CreateDefault();
             var request = new ClientCredentialsRequest(CLIENTID, CLIENTSECRET);
             var response = await new OAuthClient(config).RequestToken(request);
@@ -91,7 +91,7 @@ namespace Program4c
             // choice = input from default.aspx
             int choice = 1;
             string trackID = trackResults.Result[choice].Id;
-            string artistID = trackResults.Result[choice].Artists[choice].Id;
+            string artistID = trackResults.Result[choice].Artists[0].Id;
 
             //get the genres of the artist by searching for the exact artist name based on choice from user
             List<string> artistGenres = new List<string>();

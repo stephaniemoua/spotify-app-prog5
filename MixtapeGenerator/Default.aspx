@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Program4c._Default" %>
+﻿<%@ Page Title="Home Page" Language="C#" Async="true" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Program4c._Default" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -8,7 +8,7 @@
 
 <%--@* Default section: Search bar for initial input*@--%>
     <p>
-        <asp:TextBox ID="TextBox1" runat="server" Text="Enter a song name" OnTextChanged="TextBox1_TextChanged"></asp:TextBox>
+        <asp:TextBox ID="TextBox1" runat="server" Text="Enter a song name" ></asp:TextBox>
           
     &nbsp;&nbsp;&nbsp;
           
