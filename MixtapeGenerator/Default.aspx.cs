@@ -55,57 +55,63 @@ namespace Program4c
             var search = await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Track, searchSong));
 
             //Get tracks from search result
-            IAsyncEnumerable<FullTrack> trackResults = spotify.Paginate(search.Tracks, (s) => s.Tracks);
-            var enumerator = trackResults.GetAsyncEnumerator();
+            var trackResults = spotify.PaginateAll(search.Tracks, (s) => s.Tracks);
 
-            //add the first 5 results into a list
-            List<FullTrack> trackList = new List<FullTrack>();
+            //add the first 5 results into a list. This shouldn't be needed with paginate all
+           /* List<FullTrack> trackList = new List<FullTrack>();
             for (int i = 0; i <= 5; i++)
             {
                 trackList.Add(enumerator.Current);
                 await enumerator.MoveNextAsync();
-            }
+            }*/
 
             string temp = "";
-            //print list
-            for (int i = 1; i < trackList.Count; i++)
+            //print list of first 5 items that appear in search result
+            for (int i = 0; i < 5; i++)
             {
-                if (trackList[i] != null)
+                if (trackResults.Result[i] != null)
                 {
                     //at this point we want user to input a number
                     //Console.Write("Option " + i + ": \"" + trackList[i].Name + "\" by \"" + trackList[i].Artists[0].Name + "\"");
                     //Console.WriteLine(" From the album \"" + trackList[i].Album.Name + "\"");
-                    temp = i + ": \"" + trackList[i].Name + "\" by \"" + trackList[i].Artists[0].Name + "\"" + " From the album \"" + trackList[i].Album.Name + "\"";
+                    temp = i + ": \"" + trackResults.Result[i].Name + "\" by \"" + trackResults.Result[i].Artists[0].Name 
+                        + "\"" + " From the album \"" + trackResults.Result[i].Album.Name + "\"";
                 }
             }
 
             // Each generated option is displayed as an option  
             // User must choose one option 
-            Option1.Text = trackList[0].Name + "\" by \"" + trackList[0].Artists[0].Name + "\"" + " From the album \"" + trackList[0].Album.Name;
-            Option2.Text = trackList[1].Name + "\" by \"" + trackList[1].Artists[0].Name + "\"" + " From the album \"" + trackList[1].Album.Name;
-            Option3.Text = trackList[2].Name + "\" by \"" + trackList[2].Artists[0].Name + "\"" + " From the album \"" + trackList[2].Album.Name;
-            Option4.Text = trackList[3].Name + "\" by \"" + trackList[3].Artists[0].Name + "\"" + " From the album \"" + trackList[3].Album.Name;
-            Option5.Text = trackList[4].Name + "\" by \"" + trackList[4].Artists[0].Name + "\"" + " From the album \"" + trackList[4].Album.Name;
+            Option1.Text = trackResults.Result[0].Name + "\" by \"" + trackResults.Result[0].Artists[0].Name + "\"" + " From the album \"" + trackResults.Result[0].Album.Name;
+            Option2.Text = trackResults.Result[1].Name + "\" by \"" + trackResults.Result[1].Artists[0].Name + "\"" + " From the album \"" + trackResults.Result[1].Album.Name;
+            Option3.Text = trackResults.Result[2].Name + "\" by \"" + trackResults.Result[2].Artists[0].Name + "\"" + " From the album \"" + trackResults.Result[2].Album.Name;
+            Option4.Text = trackResults.Result[3].Name + "\" by \"" + trackResults.Result[3].Artists[0].Name + "\"" + " From the album \"" + trackResults.Result[3].Album.Name;
+            Option5.Text = trackResults.Result[4].Name + "\" by \"" + trackResults.Result[4].Artists[0].Name + "\"" + " From the album \"" + trackResults.Result[4].Album.Name;
 
             // Matches the choice from the list 
             // choice = input from default.aspx
             int choice = 1;
-            string trackID = trackList[choice].Id;
-            string artistID = trackList[choice].Artists[choice].Id;
+            string trackID = trackResults.Result[choice].Id;
+            string artistID = trackResults.Result[choice].Artists[choice].Id;
 
-            //get the genres of the artist by searching for the exact artist name
+            //get the genres of the artist by searching for the exact artist name based on choice from user
             List<string> artistGenres = new List<string>();
-            search = await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Artist, trackList[1].Artists[0].Name));
-            IAsyncEnumerable<FullArtist> artistResults = spotify.Paginate(search.Artists, (s) => s.Artists);
+            search = await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Artist, trackResults.Result[choice].Artists[0].Name));
+            var artistResults = spotify.PaginateAll(search.Artists, (s) => s.Artists);
 
             //go through every artist until we find a matching artist ID.
             //This may be problematic if we run into a weird case where we get the ID but when searching by name the artist doesnt show up
-            await foreach (var item in artistResults)
+            //I set i to 50 because I wasn't sure how to iterate through the whole ilist, 80% sure we will have a 99% chance we find the artist
+            for (int i = 0; i < 50; i++)
             {
-                //to ensure we have the right artis
-                if (item.Id == artistID)
+                if (artistResults.Result[i] == null)
                 {
-                    artistGenres = item.Genres;
+                    //if we ran out of results to look for?
+                    break;
+                }
+                //to ensure we have the right artis
+                if (artistResults.Result[i].Id == artistID)
+                {
+                    artistGenres = artistResults.Result[i].Genres;
                     break;
                 }
             }
