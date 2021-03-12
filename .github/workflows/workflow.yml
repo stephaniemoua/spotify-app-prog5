@@ -41,7 +41,7 @@ jobs:
       env:
         SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
         SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
-      run: msbuild .\MixtapeGenerator.sln 
+      run: msbuild .\MixtapeGenerator.sln -p:SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID;SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET
     - name: 'Run Azure webapp deploy action using publish profile credentials'
       uses: azure/webapps-deploy@v2
       with: 
