@@ -43,8 +43,8 @@ namespace Program4c
 
             Label1.Text = "Searching for " + song;
 
-            string CLIENTID = "APIKEYHERE";
-            string CLIENTSECRET = "APISECRETKEYHERE";
+            string CLIENTID = Environment.GetEnvironmentVariable("SPOTIFY_CLIENT_ID");
+            string CLIENTSECRET = Environment.GetEnvironmentVariable("SPOTIFY_CLIENT_SECRET");
             var config = SpotifyClientConfig.CreateDefault();
             var request = new ClientCredentialsRequest(CLIENTID, CLIENTSECRET);
             var response = await new OAuthClient(config).RequestToken(request);
