@@ -1,0 +1,141 @@
+﻿
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.UI;
+using System.Net.Http;
+using SpotifyAPI.Web;
+
+
+namespace Program4c
+{
+    public partial class _Default : Page
+    {
+        SpotifyClient spotify;
+
+        protected void Page_Load(object sender, EventArgs e) { }
+
+        // Function for 'search' button after click 
+        // Uses Spotify Search API to find the root song 
+        protected async void Button1_Submit_Click(object sender, EventArgs e)
+        {
+            // Get input from user via TextBox
+            string song = Convert.ToString(TextBox1.Text);
+            // Get input from user via TextBox
+            string artist = Convert.ToString(TextBox2.Text);
+
+            string searchSong = "";
+
+            if (song.Length > 0 && artist.Length > 0)
+            {
+                searchSong = song + " " + artist;
+            } // 
+
+            else if (song.Length == 0) //no song input
+            {
+                // display an error message
+
+            }
+            else if (artist.Length > 0)
+            {
+                searchSong = song;
+            }
+
+            Label1.Text = "Searching for " + song;
+
+            string CLIENTID = "replace-with-id";
+            string CLIENTSECRET = "replace-with-secret";
+            var config = SpotifyClientConfig.CreateDefault();
+            var request = new ClientCredentialsRequest(CLIENTID, CLIENTSECRET);
+            var response = await new OAuthClient(config).RequestToken(request);
+            spotify = new SpotifyClient(config.WithToken(response.AccessToken));
+            // [placeholder] catch Spotify connection errors
+
+            //perform search. CAN REPLACE WITH USER INPUTTED REQUEST HERE
+            var search = await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Track, searchSong));
+
+            //Get tracks from search result
+            IAsyncEnumerable<FullTrack> trackResults = spotify.Paginate(search.Tracks, (s) => s.Tracks);
+            var enumerator = trackResults.GetAsyncEnumerator();
+
+            //add the first 5 results into a list
+            List<FullTrack> trackList = new List<FullTrack>();
+            for (int i = 0; i <= 5; i++)
+            {
+                trackList.Add(enumerator.Current);
+                await enumerator.MoveNextAsync();
+            }
+
+            string temp = "";
+            //print list
+            for (int i = 1; i < trackList.Count; i++)
+            {
+                if (trackList[i] != null)
+                {
+                    //at this point we want user to input a number
+                    //Console.Write("Option " + i + ": \"" + trackList[i].Name + "\" by \"" + trackList[i].Artists[0].Name + "\"");
+                    //Console.WriteLine(" From the album \"" + trackList[i].Album.Name + "\"");
+                    temp = i + ": \"" + trackList[i].Name + "\" by \"" + trackList[i].Artists[0].Name + "\"" + " From the album \"" + trackList[i].Album.Name + "\"";
+                }
+            }
+
+            // Each generated option is displayed as an option  
+            // User must choose one option 
+            Option1.Text = trackList[0].Name + "\" by \"" + trackList[0].Artists[0].Name + "\"" + " From the album \"" + trackList[0].Album.Name;
+            Option2.Text = trackList[1].Name + "\" by \"" + trackList[1].Artists[0].Name + "\"" + " From the album \"" + trackList[1].Album.Name;
+            Option3.Text = trackList[2].Name + "\" by \"" + trackList[2].Artists[0].Name + "\"" + " From the album \"" + trackList[2].Album.Name;
+            Option4.Text = trackList[3].Name + "\" by \"" + trackList[3].Artists[0].Name + "\"" + " From the album \"" + trackList[3].Album.Name;
+            Option5.Text = trackList[4].Name + "\" by \"" + trackList[4].Artists[0].Name + "\"" + " From the album \"" + trackList[4].Album.Name;
+
+            // Matches the choice from the list 
+            // choice = input from default.aspx
+            int choice = 1;
+            string trackID = trackList[choice].Id;
+            string artistID = trackList[choice].Artists[choice].Id;
+
+            //get the genres of the artist by searching for the exact artist name
+            List<string> artistGenres = new List<string>();
+            search = await spotify.Search.Item(new SearchRequest(SearchRequest.Types.Artist, trackList[1].Artists[0].Name));
+            IAsyncEnumerable<FullArtist> artistResults = spotify.Paginate(search.Artists, (s) => s.Artists);
+
+            //go through every artist until we find a matching artist ID.
+            //This may be problematic if we run into a weird case where we get the ID but when searching by name the artist doesnt show up
+            await foreach (var item in artistResults)
+            {
+                //to ensure we have the right artis
+                if (item.Id == artistID)
+                {
+                    artistGenres = item.Genres;
+                    break;
+                }
+            }
+
+            // information for generating the reccomendations
+            RecommendationsRequest recFinder = new RecommendationsRequest();
+            recFinder.SeedTracks.Add(trackID);
+            recFinder.SeedGenres.Add(artistGenres[0]);
+            recFinder.SeedArtists.Add(artistID);
+
+            //WE CAN CHANGE AMOUNT OF SONGS WE WANT TO GENERATE HERE
+            recFinder.Limit = 20;
+
+            //performt he recommendation search
+            var recList = spotify.Browse.GetRecommendations(recFinder);
+
+            Console.WriteLine("\nReccomendations found: ");
+
+            string recommendations = "";
+            for (int i = 0; i < recList.Result.Tracks.Count; i++)
+            {
+                string tmp = ("Song " + (i + 1) + ": \"" + recList.Result.Tracks[i].Name + "\" by " + recList.Result.Tracks[i].Artists[0].Name);
+                recommendations.Concat(tmp);
+                //maybe print the URL for a track here idk how to find it I'm happy with what is done so far.
+            }
+
+            RecLabel.Text = "Reccomendations found: " + recommendations;
+
+        }
+
+
+    }
+}

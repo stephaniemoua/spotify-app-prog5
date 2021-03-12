@@ -3,7 +3,7 @@ name: Deploy ASP.NET MVC App deploy to Azure Web App
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
       - '*'
@@ -38,7 +38,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
     
     - name: Run MSBuild
-      run: msbuild .\program4c.sln
+      run: msbuild .\MixtapeGenerator.sln
       env:
         SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
         SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
@@ -47,6 +47,6 @@ jobs:
       with: 
         app-name: ${{ env.AZURE_WEBAPP_NAME }} # Replace with your app name
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} # Define secret variable in repository settings as per action documentation
-        package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/program4c/'
+        package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/MixtapeGenerator/'
   
   # For more samples to get started with GitHub Action workflows to deploy to Azure, refer to https://github.com/Azure/actions-workflow-samples

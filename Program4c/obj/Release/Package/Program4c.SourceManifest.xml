@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<sitemanifest>
-  <IisApp path="C:\Users\steph\Desktop\WIN2021\CSS436\Program4c\Program4c\Program4c\obj\Release\Package\PackageTmp" />
-  <setAcl path="C:\Users\steph\Desktop\WIN2021\CSS436\Program4c\Program4c\Program4c\obj\Release\Package\PackageTmp" setAclResourceType="Directory" />
-  <setAcl path="C:\Users\steph\Desktop\WIN2021\CSS436\Program4c\Program4c\Program4c\obj\Release\Package\PackageTmp" setAclUser="anonymousAuthenticationUser" setAclResourceType="Directory" />
-</sitemanifest>
